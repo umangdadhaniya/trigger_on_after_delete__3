@@ -1,0 +1,28 @@
+//if Account Industry isUpdated put same in 1  description  
+trigger triggeronAccountUseAfter on Account (after update) {
+    map<string,Account> mapacc = new map<string,Account>();
+    list<contact> licon = new list<contact>();
+    list<contact> liconUpdate = new list<contact>();
+    if(trigger.isUpdate  && trigger.isExecuting && trigger.isAfter){
+        for(account ac:trigger.new){
+            if(ac.Industry != trigger.oldmap.get(ac.id).Industry){
+                mapacc.put(ac.id, ac);
+                if(mapacc.size()>0){
+                    licon=[select id, description,account.id from contact where account.id =: mapacc.keyset()];
+                    
+                }
+                if(licon.size()>0){
+                    for(contact con:licon){
+                        con.description = mapacc.get(con.Accountid).industry;
+                        liconUpdate.add(con);
+                       
+                    }
+                }
+                
+                
+            }
+        }
+    }
+    update liconupdate;
+    
+}
